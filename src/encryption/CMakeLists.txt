@@ -1,4 +1,5 @@
 add_library(encryption STATIC
+    include/encryption/swap.h
     include/encryption/int.h
     include/encryption/sha.h
     include/encryption/rsa.h
@@ -7,3 +8,4 @@ add_library(encryption STATIC
     src/rsa.cpp)
 
 target_include_directories(encryption PUBLIC include)
+target_link_libraries(encryption PUBLIC fmt)

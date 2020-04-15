@@ -1,48 +1,28 @@
 #include <encryption/rsa.h>
 
 namespace encryption {
-    // https://eli.thegreenplace.net/2009/03/28/efficient-modular-exponentiation-algorithms
     RsaKey rsaModExp(RsaKey a, RsaKey e, RsaKey n) {
-        constexpr size_t k = 5;
-        constexpr size_t base = 1u << k;
+        size_t eValue = e.toInt();
 
-        std::vector<RsaKey> table(base);
-        table[0] = RsaKey(1);
-        for (size_t b = 1; b < base; b++)
-            table[b] = table[b - 1] * a % n;
+        RsaKey value(1);
+        RsaKey result(a);
 
-        std::vector<size_t> digits;
-        RsaKey remainderE = e;
-        RsaKey zero(0);
-        RsaKey baseInt(base);
-        while (remainderE > zero) {
-            RsaKey remainder, result;
-            remainderE.division(baseInt, remainder, result);
-
-            digits.push_back(remainder.toInt());
-            remainderE = result;
-        }
-
-        RsaKey result(1);
-        for (ssize_t b = digits.size() - 1; b >= 0; b--) {
-            size_t digit = digits[b];
-
-            for (size_t c = 0; c < k; c++) {
-                result *= result;
-                result %= n;
+        while (eValue != 0) {
+            if ((eValue & 1u) != 0) {
+                value *= result;
+                value %= n;
             }
 
-            if (digit != 0) {
-                result *= result * table[digit];
-                result %= n;
-            }
+            result *= result;
+            result %= n;
+            eValue >>= 1u;
         }
 
-        return result;
+        return result % n;
     }
 
-    RsaKey rsaEncrypt(RsaKey e, RsaKey n, const uint8_t *data, size_t size) {
-        size_t keySize = n.data.size() / 8;
+    RsaKey rsaEncrypt(RsaKey n, RsaKey e, const uint8_t *data, size_t size) {
+        size_t keySize = 256;
 
         if (keySize - 11 < size)
             throw std::runtime_error("RSA 2048 cannot encrypt more than 245 bytes.");
@@ -56,7 +36,7 @@ namespace encryption {
         for (uint32_t a = 0; a < paddingSize; a++) {
             uint8_t random = 0;
             while (random == 0) {
-                random = rand();
+                random = 47;
             }
 
             result[2 + a] = random;

@@ -47,9 +47,10 @@ int main() {
     tls::data::Asn1 info(infoParser);
 
     std::vector<uint8_t> publicKeyData(info.children[0].data.begin() + 1, info.children[0].data.end());
+    std::vector<uint8_t> publicExpData(info.children[1].data.begin(), info.children[1].data.end());
 
     RsaKey publicKey(publicKeyData.data(), publicKeyData.size());
-    RsaKey publicExp(info.children[1].data.data(), info.children[1].data.size());
+    RsaKey publicExp(publicExpData.data(), publicExpData.size());
 
     const char *text = "welcome to the secret world of cheese";
     RsaKey result = rsaEncrypt(publicKey, publicExp, (const uint8_t *)text, strlen(text));
