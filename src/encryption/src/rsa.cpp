@@ -1,29 +1,30 @@
 #include <encryption/rsa.h>
 
 namespace encryption {
-    RsaKey rsaModExp(RsaKey a, RsaKey e, RsaKey n) {
+    BigInt rsaModExp(const BigInt &a, const BigInt &e, const BigInt &n) {
         size_t eValue = e.toInt();
 
-        RsaKey value(1);
-        RsaKey result(a);
+        BigInt result = BigInt::fromInt(1);
 
         while (eValue != 0) {
-            if ((eValue & 1u) != 0) {
-                value *= result;
-                value %= n;
-            }
-
             result *= result;
             result %= n;
+
+            if ((eValue & 1u) != 0) {
+                result *= a;
+                result %= n;
+            }
+
             eValue >>= 1u;
         }
 
         return result % n;
     }
 
-    RsaKey rsaEncrypt(RsaKey n, RsaKey e, const uint8_t *data, size_t size) {
+    BigInt rsaEncrypt(const BigInt &n, const BigInt &e, const uint8_t *data, size_t size) {
         size_t keySize = 256;
 
+        // uwah bigint is variable size now
         if (keySize - 11 < size)
             throw std::runtime_error("RSA 2048 cannot encrypt more than 245 bytes.");
 
@@ -35,16 +36,15 @@ namespace encryption {
 
         for (uint32_t a = 0; a < paddingSize; a++) {
             uint8_t random = 0;
-            while (random == 0) {
-                random = 47;
-            }
+            while (random == 0)
+                random = rand() & 0xFF;
 
             result[2 + a] = random;
         }
         result[2 + paddingSize] = 0x00;
         std::memcpy(&result[3 + paddingSize], data, size);
 
-        RsaKey resultInt(result.data(), result.size());
+        BigInt resultInt(result.data(), result.size());
         return rsaModExp(resultInt, e, n);
     }
 }

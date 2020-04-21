@@ -5,7 +5,5 @@
 #include <vector>
 
 namespace encryption {
-    using RsaKey = BigInt<32>;
-
-    RsaKey rsaEncrypt(RsaKey e, RsaKey n, const uint8_t *data, size_t size);
+    BigInt rsaEncrypt(const BigInt &e, const BigInt &n, const uint8_t *data, size_t size);
 }

@@ -23,6 +23,8 @@ namespace tls {
     void Connection::handleCertificate(Parser &buffer) {
         data::handshakes::Certificate certificate(buffer);
 
+        bool first = true;
+
         for (const auto &a : certificate.certificates) {
             Parser parser(a.data(), a.size());
 
@@ -63,8 +65,13 @@ namespace tls {
             fmt::print("\t\tn: {}\n", binString(std::vector<uint8_t>(n.begin() + 1, n.end())));
             fmt::print("\t\te: {}\n", e);
 
-            publicKeyN = std::vector<uint8_t>(n.begin() + 1, n.end());
-            publicKeyE = e;
+            // first certificate is for this website
+            if (first) {
+                publicKeyN = encryption::BigInt(&n[1], n.size() - 1);
+                publicKeyE = encryption::BigInt::fromInt(e);
+
+                first = false;
+            }
         }
     }
 }

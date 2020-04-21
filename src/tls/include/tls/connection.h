@@ -3,10 +3,13 @@
 #include <tls/tls.h>
 #include <tls/buffer.h>
 
+#include <encryption/int.h>
+
 #include <functional>
 
 namespace tls {
-    using IoCallback = std::function<bool(uint8_t *data, uint32_t size)>;
+    using ReadIoCallback = std::function<bool(uint8_t *data, uint32_t size)>;
+    using WriteIoCallback = std::function<bool(const uint8_t *data, uint32_t size)>;
 
     enum class Type {
         Server,
@@ -15,16 +18,16 @@ namespace tls {
 
     class Connection {
         Type type;
-        IoCallback read;
-        IoCallback write;
+        ReadIoCallback read;
+        WriteIoCallback write;
 
         Version version = { 3, 3 };
-        CipherSuite cipherSuite = CipherSuite::NoCipher;
-        std::vector<uint8_t> publicKeyN = { };
-        uint64_t publicKeyE = 0;
 
-        void send(ContentType type, Serializer &serializer);
-        void send(HandshakeType type, Serializer &serializer);
+        encryption::BigInt publicKeyN;
+        encryption::BigInt publicKeyE;
+
+        void send(ContentType type, const Serializer &serializer);
+        void send(HandshakeType type, const Serializer &serializer);
 
         void handleInitialize();
         void handleClientHello(Parser &buffer);
@@ -39,6 +42,6 @@ namespace tls {
 
         void run();
 
-        Connection(Type type, IoCallback read, IoCallback write);
+        Connection(Type type, ReadIoCallback read, WriteIoCallback write);
     };
 }

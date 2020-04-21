@@ -1,7 +1,7 @@
 #include <tls/buffer.h>
 
 namespace tls {
-    size_t Parser::sizeLeft() {
+    size_t Parser::sizeLeft() const {
         return size - index;
     }
 
@@ -16,11 +16,11 @@ namespace tls {
         data.insert(data.end(), serializer.data.begin(), serializer.data.end());
     }
 
-    uint8_t * Serializer::getData() {
+    const uint8_t *Serializer::getData() const {
         return data.data();
     }
 
-    size_t Serializer::getSize() {
+    size_t Serializer::getSize() const {
         return data.size();
     }
 }

@@ -4,6 +4,7 @@ add_library(encryption STATIC
     include/encryption/sha.h
     include/encryption/rsa.h
 
+    src/int.cpp
     src/sha.cpp
     src/rsa.cpp)
 

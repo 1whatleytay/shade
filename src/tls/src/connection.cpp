@@ -9,7 +9,7 @@
 #include <tls/data/handshake.h>
 
 namespace tls {
-    void Connection::send(ContentType contentType, Serializer &serializer) {
+    void Connection::send(ContentType contentType, const Serializer &serializer) {
         Serializer plaintextSerializer;
         data::Plaintext plaintext;
         plaintext.type = contentType;
@@ -20,7 +20,7 @@ namespace tls {
 
         write(plaintextSerializer.getData(), plaintextSerializer.getSize());
     }
-    void Connection::send(HandshakeType handshakeType, Serializer &serializer) {
+    void Connection::send(HandshakeType handshakeType, const Serializer &serializer) {
         Serializer handshakeSerializer;
         data::Handshake handshake;
         handshake.type = handshakeType;
@@ -92,6 +92,6 @@ namespace tls {
         }
     }
 
-    Connection::Connection(Type type, IoCallback read, IoCallback write)
+    Connection::Connection(Type type, ReadIoCallback read, WriteIoCallback write)
         : type(type), read(std::move(read)), write(std::move(write)) { }
 }

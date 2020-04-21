@@ -35,7 +35,7 @@ namespace tls {
                 throw std::runtime_error("Parser read too much.");
         }
 
-        size_t sizeLeft();
+        size_t sizeLeft() const;
 
         explicit Parser(const uint8_t *data, size_t size);
         ~Parser();
@@ -61,7 +61,7 @@ namespace tls {
 
         void append(const Serializer &serializer);
 
-        uint8_t *getData();
-        size_t getSize();
+        const uint8_t *getData() const;
+        size_t getSize() const;
     };
 }
